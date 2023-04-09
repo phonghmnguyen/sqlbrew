@@ -1,46 +1,41 @@
-import copy
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
-class MultiHeadedAttention(nn.Module):
-    def __init__(self, h, d_model, dropout=0.1):
-        super(MultiHeadedAttention, self).__init__()
-        assert d_model % h == 0
+class MultiHeadAttention(nn.Module):
+    def __init__(self, cfg):
+        super(MultiHeadAttention, self).__init__()
+        # embedding dimension must be divisible by number of heads
+        assert cfg.emb_dim % cfg.n_head == 0
         
-        self.d_k = d_model // h
-        self.h = h
-        self.linears = nn.ModuleList(
-            copy.deepcopy([nn.Linear(d_model, d_model) for _ in range(4)])
-        )
-        self.attn = None
-        self.dropout = nn.Dropout(p=dropout)
+        # key, query, value projections for all heads
+        self.c_attn = nn.Linear(cfg.emb_dim, 3 * cfg.emb_dim)
+        # output projection
+        self.c_proj = nn.Linear(cfg.emb_dim, cfg.emb_dim)
 
-    def forward(self, query, key, value, mask=None):
-        if mask is not None:
-            mask = mask.unsqueeze(1)
-        nbatches = query.size(0)
+        self.n_head = cfg.n_head
+        self.emb_dim = cfg.emb_dim
+        
+        # regularization
+        self.dropout = cfg.dropout
+        self.attn_dropout = nn.Dropout(self.dropout)
+        self.resid_dropout = nn.Dropout(self.dropout)
 
-        query, key, value = \
-            [l(x).view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
-             for l, x in zip(self.linears, (query, key, value))]
 
-        x, self.attn = attention(query, key, value, mask=mask, 
-                                 dropout=self.dropout)
-
-        x = x.transpose(1, 2).contiguous() \
-             .view(nbatches, -1, self.h * self.d_k)
-        return self.linears[-1](x)
-    
-
-def attention(query, key, value, mask=None, dropout=None):
-    d_k = query.size(-1)
-    scores = torch.matmul(query, key.transpose(-2, -1)) \
-             / math.sqrt(d_k)
-    if mask is not None:
-        scores = scores.masked_fill(mask == 0, -1e9)
-    p_attn = F.softmax(scores, dim = -1)
-    if dropout is not None:
-        p_attn = dropout(p_attn)
-    return torch.matmul(p_attn, value), p_attn
+    def forward(self, x, mask=None):
+        # B: batch size, S: sequence length, E: embedding dimension
+        B, S, E = x.size()
+        # pull out the query, key, value from the concatenated projection
+        q, k, v = self.c_attn(x).split(self.emb_dim, dim=2)
+        # split heads and transpose to (B, n_head, S, E // n_head)
+        q = q.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
+        k = k.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
+        v = v.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
+        # apply attention
+        y = F.scaled_dot_product_attention(q, k, v, dropout=self.attn_dropout, mask=mask)
+        # concatenate heads and transpose to (B, S, E)
+        y = y.transpose(1, 2).contiguous().view(B, S, E)
+        # apply drop out to final linear projection
+        y = self.resid_dropout(self.c_proj(y))
+        return y
