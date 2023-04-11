@@ -1,13 +1,14 @@
 import torch.nn as nn
 
 class FeedForwardNetwork(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, d_model, d_ffn_hidden, dropout):
         super(FeedForwardNetwork, self).__init__()
         self.layers = nn.ModuleList(
-            [nn.Linear(cfg.emb_dim, cfg.ffn_dim),
-            nn.ReLU(),
-            nn.Dropout(cfg.dropout),
-            nn.Linear(cfg.ffn_dim, cfg.emb_dim)]
+            [   nn.Linear(d_model, d_ffn_hidden),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(d_ffn_hidden, d_model)
+            ]
         )
 
     def forward(self, x):
