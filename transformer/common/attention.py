@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .scaled_dp_attn import ScaledDotProductAttention
 
 
 class MultiHeadAttention(nn.Module):
@@ -21,6 +22,8 @@ class MultiHeadAttention(nn.Module):
         self.dropout = dropout
         self.resid_dropout = nn.Dropout(self.dropout)
 
+        self.attn = ScaledDotProductAttention(self.dropout)
+
 
     def forward(self, x, mask=None):
         # B: batch size, S: sequence length, E: embedding dimension
@@ -32,7 +35,10 @@ class MultiHeadAttention(nn.Module):
         k = k.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
         v = v.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
         # apply attention
-        y = F.scaled_dot_product_attention(q, k, v, dropout=self.dropout, is_causal=mask)
+        if mask is not None:
+            # for head axis broadcasting
+            mask = mask.unsqueeze(1)
+        y = self.attn(q, k, v, mask=mask)
         # concatenate heads and transpose to (B, S, E)
         y = y.transpose(1, 2).contiguous().view(B, S, E)
         # apply drop out to final linear projection
