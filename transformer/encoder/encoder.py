@@ -35,6 +35,10 @@ class Encoder(nn.Module):
               for _ in range(n_stack)
             ]
         )
+
+        # I decided to go with separated embeddings for the encoder and decoder approach
+        # as opposed to the original transformer paper, because intuitively it gives
+        # the model the ability to learn different representations for 2 different corpora (English vs SQL)
         self.emb = Embeddings(d_model)
         self.pos = PositionalEncoding(d_model, dropout, max_len=corpus_len)
         self.dropout = nn.Dropout(dropout)
