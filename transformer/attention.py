@@ -23,11 +23,15 @@ class MultiHeadAttention(nn.Module):
         self.attn = ScaledDotProductAttention(self.dropout)
 
 
-    def forward(self, x, mask=None):
+    def forward(self, x, *qkv, mask=None):
         # B: batch size, S: sequence length, E: embedding dimension
         B, S, E = x.size()
-        # pull out the query, key, value from the concatenated projection
-        q, k, v = self.c_attn(x).split(self.d_model, dim=2)
+        # for decoder's second attention layer we use encoder output as key and value
+        if qkv:
+            q, k, v = qkv
+        else:
+            # pull out the query, key, value from the concatenated projection
+            q, k, v = self.c_attn(x).split(self.d_model, dim=2)
         # split heads and transpose to (B, n_head, S, E // n_head)
         q = q.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
         k = k.view(B, S, self.n_head, E // self.n_head).transpose(1, 2)
