@@ -16,11 +16,7 @@ class MultiHeadAttention(nn.Module):
         self.n_head = n_head
         self.d_model = d_model
         
-        # regularization
-        self.dropout = dropout
-        self.resid_dropout = nn.Dropout(self.dropout)
-
-        self.attn = ScaledDotProductAttention(self.dropout)
+        self.attn = ScaledDotProductAttention(dropout)
 
 
     def forward(self, x, *qkv, mask=None):
@@ -43,6 +39,6 @@ class MultiHeadAttention(nn.Module):
         y = self.attn(q, k, v, mask=mask)
         # concatenate heads and transpose to (B, S, E)
         y = y.transpose(1, 2).contiguous().view(B, S, E)
-        # apply drop out to final linear projection
-        y = self.resid_dropout(self.c_proj(y))
+        # apply final linear projection
+        y = self.c_proj(y)
         return y

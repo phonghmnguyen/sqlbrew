@@ -4,8 +4,6 @@ from . import (
     MultiHeadAttention,
     FeedForwardNetwork,
     ResidualConnection,
-    Embedding,
-    PositionalEncoding
 )
 
 class DecoderLayer(nn.Module):
@@ -14,37 +12,28 @@ class DecoderLayer(nn.Module):
         self.attn = MultiHeadAttention(d_model, n_head, dropout)
         self.enc_attn = MultiHeadAttention(d_model, n_head, dropout)
         self.ffn = FeedForwardNetwork(d_model, d_ffn_hidden)
-        self.residual = nn.ModuleList([
-            ResidualConnection(self.attn),
-            ResidualConnection(self.enc_attn),
-            ResidualConnection(self.ffn),
+        self.resid_conns = nn.ModuleList([
+            ResidualConnection(d_model, dropout) for _ in range(3)
         ])
 
-    def forward(self, dec_in, enc_out, mask=None):
-        dec_out = self.residual[0](dec_in, mask=mask)
-        dec_out = self.residual[1](None, dec_out, enc_out, enc_out)
-        dec_out = self.residual[2](dec_out)
-        return dec_out
+    def forward(self, x, enc_out, mask=None):
+        x = self.resid_conns[0](x, lambda x: self.attn(x, mask=mask))
+        x = self.resid_conns[1](x, lambda x: self.enc_attn(x, enc_out, enc_out))
+        return self.resid_conns[2](x, self.ffn)
     
 
 class Decoder(nn.Module):
-    def __init__(self, d_model, n_stack, n_head, d_ffn_hidden, n_vocab, dropout):
+    def __init__(self, d_model, n_stack, n_head, d_ffn_hidden, dropout):
         super(Decoder, self).__init__()
-        self.embed = Embedding(n_vocab, d_model)
-        self.pos_enc = PositionalEncoding(d_model, dropout, max_len=n_vocab)
-        self.dropout = nn.Dropout(dropout)
-        self.d_model = d_model
         self.dec_stack = nn.ModuleList([
             DecoderLayer(d_model, n_head, d_ffn_hidden, dropout)
               for _ in range(n_stack)
             ]
         )
 
-    def forward(self, tgt_seq, enc_out, mask):
-        embed = self.embed(tgt_seq)
-        dec_out = self.dropout(self.pos_enc(embed))
+    def forward(self, x, enc_out, mask=None):
         for dec in self.dec_stack:
-            dec_out = dec(dec_out, enc_out, mask=mask)
+            x = dec(x, enc_out, mask=mask)
 
-        return dec_out
+        return x
 
