@@ -4,6 +4,14 @@ from .scaled_dp_attn import ScaledDotProductAttention
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, n_head, dropout):
+        """
+        a Multi-Head Attention layer.
+        
+        Args:
+            d_model: The dimensionality of the embedding vector.
+            n_head: the number of heads to split the dimension of d_model into.
+            dropout: The dropout rate to apply after the attention computation.
+        """
         super(MultiHeadAttention, self).__init__()
         # embedding dimension must be divisible by number of heads
         assert d_model % n_head == 0
@@ -20,6 +28,17 @@ class MultiHeadAttention(nn.Module):
 
 
     def forward(self, x, *qkv, mask=None):
+        """
+        Compute multi-head attention over a sequence of embeddings x.
+
+        Args:
+            x: tensor of shape (B, S, E), where B is the batch size, S is the sequence length, and E is the embedding dimension.
+            qkv: optional tuple of three tensors, each of shape (B, S, E), representing the query, key, and value inputs to the attention layer.
+            mask: optional tensor of shape (B, 1, S, S) representing the attention mask to apply.
+
+        Returns:
+            y: tensor of shape (B, S, E), the output of the multi-head attention layer.
+        """
         # B: batch size, S: sequence length, E: embedding dimension
         B, S, E = x.size()
         # for decoder's second attention layer we use encoder output as key and value

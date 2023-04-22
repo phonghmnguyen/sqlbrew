@@ -4,10 +4,28 @@ import torch.nn.functional as F
 
 class ScaledDotProductAttention(nn.Module):
     def __init__(self, dropout):
+        """
+        Scaled dot-product attention mechanism used in the Transformer.
+
+        Args:
+            dropout: The dropout regularization rate.
+        """
         super(ScaledDotProductAttention, self).__init__()
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, q, k, v, mask=None):
+        """
+        Computes the scaled dot-product attention of the given query, key, and value tensors.
+
+        Args:
+            q: The query tensor of shape `(batch_size, n_head, seq_len, d_model // n_head)`.
+            k: The key tensor of shape `(batch_size, n_head, seq_len, d_model // n_head)`.
+            v: The value tensor of shape `(batch_size, n_head, seq_len, d_model // n_head)`.
+            mask: The optional mask tensor of shape `(batch_size, n_head, seq_len, seq_len)`.
+
+        Returns:
+            The output tensor of shape `(batch_size, n_head, seq_len, d_model)`.
+        """
         attn_score= torch.matmul(q, k.transpose(2, 3))
 
         # apply mask to upper diagonal submatrix, mask_dim: (B, n_head, S, S)
