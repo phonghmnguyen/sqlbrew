@@ -1,10 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from . import (
-    MultiHeadAttention,
-    FeedForwardNetwork,
-    ResidualConnection,
-)
+from .attention import MultiHeadAttention
+from .ffn import FeedForwardNetwork
+from .residual import ResidualConnection
 
 
 class EncoderLayer(nn.Module):

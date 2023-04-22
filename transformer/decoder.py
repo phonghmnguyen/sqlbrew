@@ -1,10 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
-from . import (
-    MultiHeadAttention,
-    FeedForwardNetwork,
-    ResidualConnection,
-)
+from .attention import MultiHeadAttention
+from .ffn import FeedForwardNetwork
+from .residual import ResidualConnection
+
 
 class DecoderLayer(nn.Module):
     def __init__(self, d_model, n_head, d_ffn_hidden, dropout=0.1):
