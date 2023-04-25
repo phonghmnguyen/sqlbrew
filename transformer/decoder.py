@@ -38,7 +38,7 @@ class DecoderLayer(nn.Module):
             The output tensor of the decoder of shape (batch_size, seq_len, d_model).
         """
         x = self.resid_conns[0](x, lambda x: self.attn(x, mask=mask))
-        x = self.resid_conns[1](x, lambda x: self.enc_attn(x, enc_out, enc_out))
+        x = self.resid_conns[1](x, lambda x: self.enc_attn(None, x, enc_out, enc_out))
         return self.resid_conns[2](x, self.ffn)
     
 
@@ -50,9 +50,9 @@ class Decoder(nn.Module):
         Args:
             d_model: The dimensionality of embedding vector.
             n_stack: The number of Decoder layers to stack.
-            n_head (int): The number of parallel attention layers.
-            d_ffn_hidden (int): The size of the hidden layer in the feedforward network.
-            dropout (float): The dropout regularization rate.
+            n_head: The number of parallel attention layers.
+            d_ffn_hidden: The size of the hidden layer in the feedforward network.
+            dropout: The dropout regularization rate.
         """
         super(Decoder, self).__init__()
         self.dec_stack = nn.ModuleList([

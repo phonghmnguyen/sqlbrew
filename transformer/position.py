@@ -9,9 +9,9 @@ class PositionalEncoding(nn.Module):
         A module for adding positional encoding to input sequences.
 
         Args:
-            d_model (int): The dimensionality of embedding vector.
-            dropout (float): The dropout regularization rate.
-            max_len (int): The maximum length of a sequence.
+            d_model: The dimensionality of embedding vector.
+            dropout: The dropout regularization rate.
+            max_len: The maximum length of a sequence.
         """
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
@@ -35,5 +35,5 @@ class PositionalEncoding(nn.Module):
         Returns:
             The input sequence tensor with positional encoding added, of shape (batch_size, seq_len, d_model).
         """
-        x = x + Variable(self.pe[:, :x.size(1), :], requires_grad=False)
+        x = x + self.pe[:, :x.size(1), :]
         return self.dropout(x)

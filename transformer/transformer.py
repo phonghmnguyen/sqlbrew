@@ -27,9 +27,8 @@ class Transformer(nn.Module):
             p_emb: A sequential block that contains the embeddings layer and the
                 positional encoding layer for the target sequence.
             decoder: An instance of the Decoder class that processes the target sequence.
-
-        gen: An instance of the Generator class that maps the output of the decoder
-            to a probability distribution over the vocabulary.
+            gen: An instance of the Generator class that maps the output of the decoder
+                to a probability distribution over the vocabulary.
     """
     def __init__(self, config):
         super(Transformer, self).__init__()
@@ -37,7 +36,7 @@ class Transformer(nn.Module):
         self.enc_block = nn.ModuleDict(dict(
             p_emb = nn.Sequential(
                 Embedding(config.src_vocab_size, config.d_model, config.pad_idx),
-                PositionalEncoding(config.d_model, config.dropout, config.max_len)
+                PositionalEncoding(config.d_model, config.dropout, config.src_max_len)
             ),
             encoder = Encoder(
                 config.d_model,
@@ -50,7 +49,7 @@ class Transformer(nn.Module):
         self.dec_block = nn.ModuleDict(dict(
             p_emb = nn.Sequential(
                 Embedding(config.tgt_vocab_size, config.d_model, config.pad_idx),
-                PositionalEncoding(config.d_model, config.dropout, config.max_len)
+                PositionalEncoding(config.d_model, config.dropout, config.tgt_max_len)
             ),
             decoder = Decoder(
                 config.d_model,
@@ -59,8 +58,8 @@ class Transformer(nn.Module):
                 config.d_ffn_hidden,
                 config.dropout
             ),
+            gen = Generator(config.d_model, config.tgt_vocab_size),
         ))
-        self.gen = Generator(config.d_model, config.tgt_vocab_size)
 
     def _encode(self, src):
         """
@@ -114,13 +113,13 @@ class Transformer(nn.Module):
         """
         enc_out = self._encode(src) 
         dec_out = self._decode(tgt, enc_out, mask)
-        return self.gen(dec_out)
+        return self.dec_block.gen(dec_out)
 
     @classmethod
-    def load_from_checkpoint(cls, path):
-        pass
-
-    @torch.no_grad()
-    def generate(self):
+    def from_pretrained(self, path):
         pass
        
+    # inference time
+    @torch.no_grad()
+    def generate(self, src):
+        pass

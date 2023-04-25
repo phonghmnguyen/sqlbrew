@@ -5,11 +5,12 @@ import torch.nn.functional as F
 class Generator(nn.Module):
     def __init__(self, d_model, n_vocab):
         """
-        A linear layer that maps from the decoder's output space to the vocabulary space with probability distribution.
+        A linear layer that maps from the decoder's output space to the vocabulary space which is then normalized
+        with softmax to produce a probability distribution over the vocabulary.
 
         Args:
-            d_model (int): The dimensionality of the model's output space.
-            n_vocab (int): The size of the vocabulary.
+            d_model: The dimensionality of the model's output space.
+            n_vocab: The size of the vocabulary.
         """
         super(Generator, self).__init__()
         self.proj = nn.Linear(d_model, n_vocab)
