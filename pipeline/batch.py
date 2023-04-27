@@ -5,7 +5,7 @@ class Batch:
     def __init__(self, src, tgt=None, pad=0):
         self.src = src
         # padding mask
-        self.src_mask = (src != pad)
+        self.src_mask = (src != pad).unsqueeze(-2)
         self._size = src.size(0)
 
         if tgt is not None:
@@ -13,9 +13,8 @@ class Batch:
             self.tgt = tgt[:, :-1]
             self.tgt_y = tgt[:, 1:]
 
-            self.tgt_mask = (tgt != pad) \
+            self.tgt_mask = (tgt != pad).unsqueeze(-2) \
             & self._subsequent_mask(tgt.size(-1)).type_as(torch.bool)
-            self.tgt_mask = self._mask(self.tgt, pad)
             # number of non padding tokens for loss normalization
             self.ntokens = (self.tgt_y != pad).data.sum()
 

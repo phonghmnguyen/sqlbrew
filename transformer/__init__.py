@@ -7,7 +7,6 @@ from .scaled_dp_attn import ScaledDotProductAttention
 from .encoder import EncoderLayer, Encoder
 from .decoder import DecoderLayer, Decoder
 from .transformer import Transformer
-from .lr_scheduler import TransformerScheduledOPT
 
 __all__ = [
     'MultiHeadAttention',
@@ -21,6 +20,5 @@ __all__ = [
     'DecoderLayer',
     'Decoder',
     'Transformer',
-    'TransformerScheduledOPT',
 ]
 
