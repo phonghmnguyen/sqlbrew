@@ -57,7 +57,7 @@ class Encoder(nn.Module):
             ]
         )
 
-    def forward(self, x):
+    def forward(self, x, mask=None):
         """
         Passes the input tensor through the encoder stack.
 
@@ -68,7 +68,7 @@ class Encoder(nn.Module):
             The output tensor of shape `(batch_size, seq_len, d_model)`.
         """
         for enc in self.enc_stack:
-            x = enc(x)
+            x = enc(x, mask)
 
         return x
 
