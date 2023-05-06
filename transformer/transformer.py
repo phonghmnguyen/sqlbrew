@@ -61,7 +61,7 @@ class Transformer(nn.Module):
             gen = Generator(config.d_model, config.tgt_vocab_size),
         ))
 
-    def _encode(self, src):
+    def _encode(self, src, mask):
         """
         Process the source sequence through the encoder and returns the
         output of the encoder.
@@ -78,7 +78,7 @@ class Transformer(nn.Module):
         we = self.enc_block.p_emb(src)
         return self.enc_block.encoder(we)
     
-    def _decode(self, tgt, memory, mask):
+    def _decode(self, memory, memory_mask, tgt, mask):
         """
         Process the target sequence through the decoder given the output of the
         encoder, and returns the output of the decoder.
@@ -96,9 +96,9 @@ class Transformer(nn.Module):
 
         """
         we = self.dec_block.p_emb(tgt)
-        return self.dec_block.decoder(we, memory, mask)
+        return self.dec_block.decoder(we, memory, mask=mask, memory_mask=memory_mask)
     
-    def forward(self, src, tgt, mask):
+    def forward(self, src, tgt, src_mask, tgt_mask):
         """
         Process the source and target sequences through the encoder and decoder
         and returns the output of the decoder.
@@ -111,8 +111,8 @@ class Transformer(nn.Module):
         Returns:
             The predicted target sequence of shape `(batch_size, tgt_len, tgt_vocab_size)`.
         """
-        enc_out = self._encode(src) 
-        dec_out = self._decode(tgt, enc_out, mask)
+        enc_out = self._encode(src, src_mask) 
+        dec_out = self._decode(enc_out, src_mask, tgt, tgt_mask)
         return self.dec_block.gen(dec_out)
 
     @classmethod

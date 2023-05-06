@@ -24,7 +24,7 @@ class EncoderLayer(nn.Module):
         ])
 
 
-    def forward(self, x):
+    def forward(self, x, mask=None):
         """
         Passes the input tensor through a single layer of the encoder.
 
@@ -34,7 +34,7 @@ class EncoderLayer(nn.Module):
         Returns:
             The output tensor of shape `(batch_size, seq_len, d_model)`.
         """
-        x = self.resid_conns[0](x, self.attn)
+        x = self.resid_conns[0](x, lambda x: self.attn(x, mask=mask))
         return self.resid_conns[1](x, self.ffn)
 
         
@@ -51,6 +51,7 @@ class Encoder(nn.Module):
             d_ffn_hidden: The size of the hidden layer in the feedforward network.
             dropout: The dropout regularization rate.
         """
+        super(Encoder, self).__init__()
         self.enc_stack = nn.ModuleList([
             EncoderLayer(d_model, n_head, d_ffn_hidden, dropout)
               for _ in range(n_stack)

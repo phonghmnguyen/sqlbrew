@@ -13,10 +13,8 @@ class Batch:
             self.tgt = tgt[:, :-1]
             self.tgt_y = tgt[:, 1:]
 
-            self.tgt_mask = (tgt != pad).unsqueeze(-2) \
-            & self._subsequent_mask(tgt.size(-1)).type_as(torch.bool)
-            # number of non padding tokens for loss normalization
-            self.ntokens = (self.tgt_y != pad).data.sum()
+            self.tgt_mask = (self.tgt != pad).unsqueeze(-2) \
+            & self._subsequent_mask(self.tgt.size(-1)).type(torch.bool)
 
     def _subsequent_mask(self, size):
         """

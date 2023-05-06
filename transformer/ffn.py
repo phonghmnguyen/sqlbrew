@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 class FeedForwardNetwork(nn.Module):
-    def __init__(self, d_model, d_ffn_hidden, dropout):
+    def __init__(self, d_model, d_ffn_hidden, dropout=0.1):
         """
         A two-layer feedforward neural network used in the Transformer.
 
@@ -29,6 +29,8 @@ class FeedForwardNetwork(nn.Module):
             Returns:
                 The output tensor of shape `(batch_size, seq_len, d_model)`.
         """
+        
         for layer in self.layers:
-            y = layer(x)
-        return y
+            x = layer(x)
+            
+        return x
