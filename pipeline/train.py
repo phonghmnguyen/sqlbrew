@@ -6,10 +6,7 @@ from torch.optim import Adam
 from pipeline.lr_scheduler import TransformerScheduledOPT
 
 
-
-
-
-def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight_decay=1e-4, path='saved_models/eng2sql.pt', device='cpu'):
+def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight_decay=1e-4, path='', device='cpu'):
     for p in model.parameters():
         if p.dim() > 1:
             init.xavier_uniform_(p)

@@ -5,9 +5,10 @@ from torch.nn.utils.rnn import pad_sequence
 from pipeline.batch import Batch
 
 class WikiSQL(Dataset):
-    def __init__(self, data_path, tokenizer, special_token_map=None):
+    def __init__(self, data_path, src_tokenizer, tgt_tokenizer, special_token_map=None):
         self.data_path = data_path
-        self.tokenizer = tokenizer
+        self.src_tokenizer = src_tokenizer
+        self.tgt_tokenizer = tgt_tokenizer
         
         self.special_token_map = special_token_map
         self.src_token2idx = self.tgt_token2idx = special_token_map # (token, idx)
@@ -40,12 +41,12 @@ class WikiSQL(Dataset):
             reader = csv.DictReader(f)
             for line in reader:
                 data.append(line)
-                self._build_vocab(self.tokenizer(line['question']), self.tokenizer(line['sql']))
+                self._build_vocab(self.src_tokenizer(line['question']), self.tgt_tokenizer(line['sql']))
         return data
     
     def collate_fn(self, batch):
-        src_tokens = [self.tokenizer(item['question']) for item in batch]
-        tgt_tokens = [self.tokenizer(item['sql']) for item in batch]
+        src_tokens = [self.src_tokenizer(item['question']) for item in batch]
+        tgt_tokens = [self.tgt_tokenizer(item['sql']) for item in batch]
         src_tokens = [[self.src_token2idx[token] for token in tokens] for tokens in src_tokens]
         tgt_tokens = [[self.tgt_token2idx[token] for token in tokens] for tokens in tgt_tokens]
         src_tensor = pad_sequence([torch.tensor(tokens) for tokens in src_tokens], batch_first=True)
