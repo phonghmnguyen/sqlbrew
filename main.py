@@ -25,6 +25,7 @@ def main():
     tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
     train_data = WikiSQL('data/train.csv', tokenizer, SPECIAL_TOKENS)
     val_data = WikiSQL('data/validation.csv', tokenizer, SPECIAL_TOKENS)
+    # baseline hyperparameters
     config = TransformerConfig(
         src_vocab_size=len(train_data.src_token2idx),
         tgt_vocab_size=len(train_data.tgt_token2idx),
@@ -39,8 +40,8 @@ def main():
     )
     model = Transformer(config)
     # GO BRUHHHHHHH for a while until running out of memory lol
-    #train(model, train_data, val_data, epochs=100, batch_size=32, lr=1e-3, weight_decay=1e-5, device='mps')
-    train(model, train_data, val_data, epochs=100, batch_size=16, lr=1e-3, weight_decay=1e-4, device='cpu')
+    #train(model, train_data, val_data, epochs=100, batch_size=32, lr=1e-3, weight_decay=1e-4, device='mps')
+    train(model, train_data, val_data, epochs=100, batch_size=32, lr=1e-3, weight_decay=1e-4, device='cpu')
 
 
 

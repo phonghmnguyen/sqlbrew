@@ -25,4 +25,4 @@ class Generator(nn.Module):
             Returns:
                 The output tensor of shape `(batch_size, seq_len, n_vocab)`.
         """
-        return F.softmax(self.proj(x), dim=-1)
+        return self.proj(x)

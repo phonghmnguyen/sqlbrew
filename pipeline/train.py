@@ -9,7 +9,7 @@ from pipeline.lr_scheduler import TransformerScheduledOPT
 
 
 
-def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight_decay=1e-4, device='cpu'):
+def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight_decay=1e-4, path='saved_models/eng2sql.pt', device='cpu'):
     for p in model.parameters():
         if p.dim() > 1:
             init.xavier_uniform_(p)
@@ -22,6 +22,7 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
     model.train()
     train_loader = train_data.get_dataloader(batch_size=batch_size, shuffle=True)
     val_loader = val_data.get_dataloader(batch_size=batch_size, shuffle=False)
+    best_val_loss = float('inf')
     for epoch in range(epochs):
         epoch_loss = 0
         for i, batch in enumerate(train_loader):
@@ -34,12 +35,11 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
             output = model(src, tgt, src_mask, tgt_mask)
             loss = criterion(output.contiguous().view(-1, output.size(-1)),
                              tgt_y.contiguous().view(-1))
-            
 
-            # scheduler.zero_grad()
+            #scheduler.zero_grad()
             optimizer.zero_grad()
             loss.backward()
-            # scheduler.step()
+            #scheduler.step()
             optimizer.step()
            
             epoch_loss += loss.item()
@@ -59,7 +59,11 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
                 loss = criterion(output.contiguous().view(-1, output.size(-1)),
                                  tgt_y.contiguous().view(-1))
                 val_loss += loss.item()
+                
             model.train()
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                torch.save(model.state_dict(), path)
 
         print(f'Epoch [{epoch + 1}/{epochs}] | Loss: {epoch_loss / len(train_loader):.4f} | Val Loss: {val_loss / len(val_loader):.4f}')
 
