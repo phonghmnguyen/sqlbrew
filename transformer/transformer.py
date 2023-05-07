@@ -1,3 +1,4 @@
+import dataclasses
 import torch
 import torch.nn as nn
 from .embedding import Embedding
@@ -6,6 +7,20 @@ from .encoder import Encoder
 from .decoder import Decoder
 from .generator import Generator
 
+
+@dataclasses.dataclass
+class TransformerConfig:
+    d_model: int
+    n_stack: int
+    n_head: int
+    d_ffn_hidden: int
+    dropout: float
+    src_max_len: int
+    tgt_max_len: int
+    src_vocab_size: int
+    tgt_vocab_size: int
+    pad_idx: int
+    
 
 class Transformer(nn.Module):
     """

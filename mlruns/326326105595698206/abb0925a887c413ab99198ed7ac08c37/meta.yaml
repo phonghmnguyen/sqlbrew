@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/abb0925a887c413ab99198ed7ac08c37/artifacts
+end_time: 1683502996581
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: abb0925a887c413ab99198ed7ac08c37
+run_name: fearless-kite-999
+run_uuid: abb0925a887c413ab99198ed7ac08c37
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1683502939971
+status: 4
+tags: []
+user_id: phongnguyen

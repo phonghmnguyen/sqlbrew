@@ -55,16 +55,19 @@ class WikiSQL(Dataset):
         self.pad = special_token_map['<pad>']
         self.unk = special_token_map['<unk>']
 
+
         if train:
-            self.src_token2idx = self.tgt_token2idx = special_token_map # (token, idx)
-            self.src_idx2token = self.tgt_idx2token = dict((idx, token) for token, idx in special_token_map.items()) # (idx, token)
+            self.src_token2idx = dict((token, idx) for token, idx in special_token_map.items()) # (token, idx)
+            self.tgt_token2idx = dict((token, idx) for token, idx in special_token_map.items())
+            self.src_idx2token = dict((idx, token) for token, idx in special_token_map.items()) # (idx, token)
+            self.tgt_idx2token = dict((idx, token) for token, idx in special_token_map.items())
         else:
             self.src_token2idx = src_token2idx_map
             self.src_idx2token = dict((idx, token) for token, idx in src_token2idx_map.items())
             self.tgt_token2idx = tgt_token2idx_map
             self.tgt_idx2token = dict((idx, token) for token, idx in tgt_token2idx_map.items())
 
-        self.data = self.load_data()[:1000]
+        self.data = self.load_data()
         
     def __len__(self):
         return len(self.data)
@@ -73,7 +76,7 @@ class WikiSQL(Dataset):
         return self.data[idx]
     
     def _build_vocab(self, src, tgt):
-        for token in src:
+        for token in src:        
             if token not in self.src_token2idx:
                 self.src_token2idx[token] = len(self.src_token2idx)
                 self.src_idx2token[self.src_token2idx[token]] = token
@@ -82,7 +85,6 @@ class WikiSQL(Dataset):
             if token not in self.tgt_token2idx:
                 self.tgt_token2idx[token] = len(self.tgt_token2idx)
                 self.tgt_idx2token[self.tgt_token2idx[token]] = token
-
     
     def load_data(self):
         data = []
@@ -98,7 +100,6 @@ class WikiSQL(Dataset):
     def collate_fn(self, batch):
         src_tokens = [self.src_tokenizer(item['question']) for item in batch]
         tgt_tokens = [self.tgt_tokenizer(item['sql']) for item in batch]
-        print(tgt_tokens[:10])
         src_tokens = [[self.sos] + [self.src_token2idx.get(token, self.unk) for token in tokens] + [self.eos] for tokens in src_tokens]
         tgt_tokens = [[self.sos] + [self.tgt_token2idx.get(token, self.unk) for token in tokens] + [self.eos] for tokens in tgt_tokens]
         src_tensor = pad_sequence([torch.tensor(tokens) for tokens in src_tokens], batch_first=True)

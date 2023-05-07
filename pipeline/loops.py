@@ -12,7 +12,7 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
     
     optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     # slow loss convergence due to small lr
-    #scheduler = TransformerScheduledOPT(optimizer, lr, model.config.d_model, 4000)
+    scheduler = TransformerScheduledOPT(optimizer, lr, model.config.d_model, 4000)
     criterion = nn.CrossEntropyLoss(ignore_index=model.config.pad_idx)
     model.to(device)
     model.train()
@@ -37,11 +37,11 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
             acc = (flatten_output.argmax(dim=-1) == flatten_tgt_y).sum() / flatten_tgt_y.size(0)
             train_acc += acc.item()
             
-            #scheduler.zero_grad()
-            optimizer.zero_grad()
+            scheduler.zero_grad()
+            #optimizer.zero_grad()
             loss.backward()
-            #scheduler.step()
-            optimizer.step()
+            scheduler.step()
+            #optimizer.step()
            
             
             print(f'Epoch [{epoch + 1}/{epochs}] | Step [{i + 1}/{len(train_loader)}] | Loss: {loss.item():.4f}')
@@ -53,7 +53,7 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
             for batch in val_loader:
                 src, tgt, tgt_y = batch.src, batch.tgt, batch.tgt_y
                 src_mask, tgt_mask = batch.src_mask, batch.tgt_mask
-
+                
                 src = torch.tensor(src).to(device)
                 tgt = torch.tensor(tgt).to(device)
 

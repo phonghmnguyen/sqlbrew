@@ -1,12 +1,12 @@
-from dataclasses import dataclass
-from typing import Optional
+import dataclasses
 import warnings
 import argparse
 import sqlparse
 import torch
 from torchtext.data.utils import get_tokenizer
+from tokenizers import ByteLevelBPETokenizer
 import mlflow
-from transformer import Transformer
+from transformer import Transformer, TransformerConfig
 from pipeline import WikiSQL, train
 
 
@@ -43,51 +43,32 @@ def parse_args() -> argparse.Namespace:
 
     return parser.parse_args()
 
-
-@dataclass
-class TransformerConfig:
-    d_model: int
-    n_stack: int
-    n_head: int
-    d_ffn_hidden: int
-    dropout: float
-    src_max_len: int
-    tgt_max_len: int
-    src_vocab_size: Optional[int] = None
-    tgt_vocab_size: Optional[int] = None
-    pad_idx: Optional[int] = None
-
-    @classmethod
-    def build_from_namespace(cls, args: argparse.Namespace):
-        return cls(
-            d_model=args.dmodel,
-            n_stack=args.nstack,
-            n_head=args.nhead,
-            d_ffn_hidden=args.dffn_hidden,
-            dropout=args.dropout,
-            src_max_len=args.src_max_len,
-            tgt_max_len=args.tgt_max_len
-        )
-    
-    def to_dict(self):
-        return vars(self)
         
-    
 def main():
     args = parse_args()
     torch.manual_seed(args.seed)
     src_tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
-    tgt_tokenizer = get_tokenizer(None) ## split by space
+    #tgt_tokenizer = get_tokenizer(None) ## split by space
     #tgt_tokenizer = lambda x: [str(token) for token in sqlparse.parse(x)[0].tokens]
+    bpe_tokenizer = ByteLevelBPETokenizer.from_file("bpe-tokenizer/vocab.json", "bpe-tokenizer/merges.txt")
+    tgt_tokenizer = lambda x: bpe_tokenizer.encode(x).tokens
+
     train_data = WikiSQL(args.train_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS)
     val_data = WikiSQL(args.val_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS, False, train_data.src_token2idx, train_data.tgt_token2idx)
     
-    config = TransformerConfig.build_from_namespace(args)
-    config.src_vocab_size = len(train_data.src_token2idx)
-    config.tgt_vocab_size = len(train_data.tgt_token2idx)
-    config.pad_idx = SPECIAL_TOKENS['<pad>']
+    config = TransformerConfig(
+        d_model=args.dmodel,
+        n_stack=args.nstack,
+        n_head=args.nhead,
+        d_ffn_hidden=args.dffn_hidden,
+        dropout=args.dropout,
+        src_max_len=args.src_max_len,
+        tgt_max_len=args.tgt_max_len,
+        src_vocab_size=len(train_data.src_token2idx),
+        tgt_vocab_size=len(train_data.tgt_token2idx),
+        pad_idx=SPECIAL_TOKENS['<pad>']
+    )
     model = Transformer(config)
-    
     mlflow.set_experiment('eng2sql')
     with mlflow.start_run():
         train(
