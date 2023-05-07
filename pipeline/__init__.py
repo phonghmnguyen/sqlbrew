@@ -1,6 +1,5 @@
-from .batch import Batch
 from .lr_scheduler import TransformerScheduledOPT
-from .preprocess import WikiSQL
+from .preprocess import WikiSQL, Batch
 from .train import train
 
 __all__ = [
