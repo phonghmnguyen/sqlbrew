@@ -45,6 +45,7 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
         with torch.no_grad():
             model.eval()
             val_loss = 0
+            val_acc = 0
             for batch in val_loader:
                 src, tgt, tgt_y = batch.src, batch.tgt, batch.tgt_y
                 src_mask, tgt_mask = batch.src_mask, batch.tgt_mask
@@ -53,16 +54,19 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
                 tgt = torch.tensor(tgt).to(device)
 
                 output = model(src, tgt, src_mask, tgt_mask)
-                loss = criterion(output.contiguous().view(-1, output.size(-1)),
-                                 tgt_y.contiguous().view(-1))
+                flatten_output = output.contiguous().view(-1, output.size(-1))
+                flatten_tgt_y = tgt_y.contiguous().view(-1)
+                loss = criterion(flatten_output, flatten_tgt_y)
                 val_loss += loss.item()
+                acc = (flatten_output.argmax(dim=-1) == flatten_tgt_y).sum() / flatten_tgt_y.size(0)
+                val_acc += acc.item()
                 
             model.train()
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 torch.save(model.state_dict(), path)
 
-        print(f'Epoch [{epoch + 1}/{epochs}] | Loss: {epoch_loss / len(train_loader):.4f} | Val Loss: {val_loss / len(val_loader):.4f}')
+        print(f'Epoch [{epoch + 1}/{epochs}] | Loss: {epoch_loss / len(train_loader):.4f} | Val Loss: {val_loss / len(val_loader):.4f} | Val Acc: {val_acc / len(val_loader):.4f}')
 
 
 

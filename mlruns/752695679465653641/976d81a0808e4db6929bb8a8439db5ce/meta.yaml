@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/752695679465653641/976d81a0808e4db6929bb8a8439db5ce/artifacts
+end_time: 1683470206566
+entry_point_name: ''
+experiment_id: '752695679465653641'
+lifecycle_stage: active
+run_id: 976d81a0808e4db6929bb8a8439db5ce
+run_name: flawless-wren-573
+run_uuid: 976d81a0808e4db6929bb8a8439db5ce
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1683468848112
+status: 4
+tags: []
+user_id: phongnguyen
