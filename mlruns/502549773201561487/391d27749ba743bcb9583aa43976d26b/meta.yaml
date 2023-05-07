@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/502549773201561487/391d27749ba743bcb9583aa43976d26b/artifacts
+end_time: 1683487467054
+entry_point_name: ''
+experiment_id: '502549773201561487'
+lifecycle_stage: active
+run_id: 391d27749ba743bcb9583aa43976d26b
+run_name: carefree-slug-664
+run_uuid: 391d27749ba743bcb9583aa43976d26b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1683485318498
+status: 4
+tags: []
+user_id: phongnguyen

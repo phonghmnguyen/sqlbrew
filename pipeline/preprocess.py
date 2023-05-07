@@ -34,15 +34,37 @@ class Batch:
         
 
 class WikiSQL(Dataset):
-    def __init__(self, data_path, src_tokenizer, tgt_tokenizer, special_token_map=None):
+    def __init__(
+            self,
+            data_path,
+            src_tokenizer,
+            tgt_tokenizer,
+            special_token_map=None,
+            train=True,
+            src_token2idx_map=None,
+            tgt_token2idx_map=None,
+        ):
         self.data_path = data_path
         self.src_tokenizer = src_tokenizer
         self.tgt_tokenizer = tgt_tokenizer
-        
         self.special_token_map = special_token_map
-        self.src_token2idx = self.tgt_token2idx = special_token_map # (token, idx)
-        self.src_idx2token = self.tgt_idx2token = dict((idx, token) for token, idx in self.special_token_map.items()) # (idx, token)
-        self.data = self.load_data()
+        self.train = train
+
+        self.sos = special_token_map['<sos>']
+        self.eos = special_token_map['<eos>']
+        self.pad = special_token_map['<pad>']
+        self.unk = special_token_map['<unk>']
+
+        if train:
+            self.src_token2idx = self.tgt_token2idx = special_token_map # (token, idx)
+            self.src_idx2token = self.tgt_idx2token = dict((idx, token) for token, idx in special_token_map.items()) # (idx, token)
+        else:
+            self.src_token2idx = src_token2idx_map
+            self.src_idx2token = dict((idx, token) for token, idx in src_token2idx_map.items())
+            self.tgt_token2idx = tgt_token2idx_map
+            self.tgt_idx2token = dict((idx, token) for token, idx in tgt_token2idx_map.items())
+
+        self.data = self.load_data()[:1000]
         
     def __len__(self):
         return len(self.data)
@@ -51,13 +73,11 @@ class WikiSQL(Dataset):
         return self.data[idx]
     
     def _build_vocab(self, src, tgt):
-        src = ['<sos>'] + src + ['<eos>']
         for token in src:
             if token not in self.src_token2idx:
                 self.src_token2idx[token] = len(self.src_token2idx)
                 self.src_idx2token[self.src_token2idx[token]] = token
         
-        tgt = ['<sos>'] + tgt + ['<eos>']
         for token in tgt:
             if token not in self.tgt_token2idx:
                 self.tgt_token2idx[token] = len(self.tgt_token2idx)
@@ -70,14 +90,17 @@ class WikiSQL(Dataset):
             reader = csv.DictReader(f)
             for line in reader:
                 data.append(line)
-                self._build_vocab(self.src_tokenizer(line['question']), self.tgt_tokenizer(line['sql']))
+                if self.train:
+                    self._build_vocab(self.src_tokenizer(line['question']), self.tgt_tokenizer(line['sql']))
+
         return data
     
     def collate_fn(self, batch):
         src_tokens = [self.src_tokenizer(item['question']) for item in batch]
         tgt_tokens = [self.tgt_tokenizer(item['sql']) for item in batch]
-        src_tokens = [[self.src_token2idx[token] for token in tokens] for tokens in src_tokens]
-        tgt_tokens = [[self.tgt_token2idx[token] for token in tokens] for tokens in tgt_tokens]
+        print(tgt_tokens[:10])
+        src_tokens = [[self.sos] + [self.src_token2idx.get(token, self.unk) for token in tokens] + [self.eos] for tokens in src_tokens]
+        tgt_tokens = [[self.sos] + [self.tgt_token2idx.get(token, self.unk) for token in tokens] + [self.eos] for tokens in tgt_tokens]
         src_tensor = pad_sequence([torch.tensor(tokens) for tokens in src_tokens], batch_first=True)
         tgt_tensor = pad_sequence([torch.tensor(tokens) for tokens in tgt_tokens], batch_first=True)
         return Batch(src_tensor, tgt_tensor)

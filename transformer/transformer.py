@@ -76,7 +76,7 @@ class Transformer(nn.Module):
     
         """
         we = self.enc_block.p_emb(src)
-        return self.enc_block.encoder(we)
+        return self.enc_block.encoder(we, mask=mask)
     
     def _decode(self, memory, memory_mask, tgt, mask):
         """

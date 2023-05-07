@@ -77,9 +77,10 @@ def main():
     args = parse_args()
     torch.manual_seed(args.seed)
     src_tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
-    tgt_tokenizer = lambda x: [str(token) for token in sqlparse.parse(x)[0].tokens]
+    tgt_tokenizer = get_tokenizer(None) ## split by space
+    #tgt_tokenizer = lambda x: [str(token) for token in sqlparse.parse(x)[0].tokens]
     train_data = WikiSQL(args.train_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS)
-    val_data = WikiSQL(args.val_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS)
+    val_data = WikiSQL(args.val_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS, False, train_data.src_token2idx, train_data.tgt_token2idx)
     
     config = TransformerConfig.build_from_namespace(args)
     config.src_vocab_size = len(train_data.src_token2idx)

@@ -35,6 +35,7 @@ class EncoderLayer(nn.Module):
             The output tensor of shape `(batch_size, seq_len, d_model)`.
         """
         x = self.resid_conns[0](x, lambda x: self.attn(x, mask=mask))
+    
         return self.resid_conns[1](x, self.ffn)
 
         

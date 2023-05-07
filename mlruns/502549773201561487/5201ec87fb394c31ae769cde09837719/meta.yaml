@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/502549773201561487/5201ec87fb394c31ae769cde09837719/artifacts
+end_time: 1683485226797
+entry_point_name: ''
+experiment_id: '502549773201561487'
+lifecycle_stage: active
+run_id: 5201ec87fb394c31ae769cde09837719
+run_name: resilient-rook-272
+run_uuid: 5201ec87fb394c31ae769cde09837719
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1683485170479
+status: 4
+tags: []
+user_id: phongnguyen

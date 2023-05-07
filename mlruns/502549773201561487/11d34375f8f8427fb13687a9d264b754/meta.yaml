@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/502549773201561487/11d34375f8f8427fb13687a9d264b754/artifacts
+end_time: 1683485009746
+entry_point_name: ''
+experiment_id: '502549773201561487'
+lifecycle_stage: active
+run_id: 11d34375f8f8427fb13687a9d264b754
+run_name: monumental-smelt-91
+run_uuid: 11d34375f8f8427fb13687a9d264b754
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1683483204714
+status: 4
+tags: []
+user_id: phongnguyen

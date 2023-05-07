@@ -39,6 +39,7 @@ class DecoderLayer(nn.Module):
         """
         x = self.resid_conns[0](x, lambda x: self.attn(x, mask=mask))
         x = self.resid_conns[1](x, lambda x: self.enc_attn(None, x, enc_out, enc_out, mask=memory_mask))
+
         return self.resid_conns[2](x, self.ffn)
     
 
