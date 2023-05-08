@@ -1,5 +1,5 @@
 artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/f7848821cd3c4592a224b12cbb369bab/artifacts
-end_time: null
+end_time: 1683523088721
 entry_point_name: ''
 experiment_id: '326326105595698206'
 lifecycle_stage: active
@@ -10,6 +10,6 @@ source_name: ''
 source_type: 4
 source_version: ''
 start_time: 1683515600758
-status: 1
+status: 4
 tags: []
 user_id: phongnguyen

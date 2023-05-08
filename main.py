@@ -38,6 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--nhead', type=int, default=4)
     parser.add_argument('--dffn_hidden', type=int, default=512)
     parser.add_argument('--dropout', type=float, default=0.1)
+    parser.add_argument('--label_smoothing', type=float, default=0.1)
     parser.add_argument('--src_max_len', type=int, default=100)
     parser.add_argument('--tgt_max_len', type=int, default=100)
 
@@ -79,18 +80,14 @@ def main():
             batch_size=args.batch_size,
             lr=args.lr,
             weight_decay=args.weight_decay,
+            label_smoothing=args.label_smoothing,
             path=args.save_path,
             device=args.device
         )
 
-        mlflow.log_params(config.to_dict())
+        mlflow.log_params(dataclasses.asdict(args))
         mlflow.pytorch.log_model(model, 'models')
-        
-        #mlflow.log_metric('val_loss', ...)
-        #mlflow.log_metric('val_acc', ...)
-        #mlflow.log_metric('test_loss', ...)
-        #mlflow.log_metric('test_acc', ...)
-    
+
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')

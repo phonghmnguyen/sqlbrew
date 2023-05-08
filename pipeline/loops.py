@@ -5,15 +5,14 @@ from torch.optim import Adam
 from pipeline.lr_scheduler import TransformerScheduledOPT
 
 
-def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight_decay=1e-4, path='', device='cpu'):
+def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight_decay=1e-4, label_smoothing=0.1, path='', device='cpu'):
     for p in model.parameters():
         if p.dim() > 1:
             init.xavier_uniform_(p)
     
     optimizer = Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-    # slow loss convergence due to small lr
     scheduler = TransformerScheduledOPT(optimizer, lr, model.config.d_model, 4000)
-    criterion = nn.CrossEntropyLoss(ignore_index=model.config.pad_idx)
+    criterion = nn.CrossEntropyLoss(ignore_index=model.config.pad_idx, label_smoothing=label_smoothing)
     model.to(device)
     model.train()
     train_loader = train_data.get_dataloader(batch_size=batch_size, shuffle=True)

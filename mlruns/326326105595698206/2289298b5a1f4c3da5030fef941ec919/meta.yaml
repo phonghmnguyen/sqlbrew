@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/2289298b5a1f4c3da5030fef941ec919/artifacts
+end_time: 1683523967435
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: 2289298b5a1f4c3da5030fef941ec919
+run_name: grandiose-hawk-706
+run_uuid: 2289298b5a1f4c3da5030fef941ec919
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1683523888326
+status: 4
+tags: []
+user_id: phongnguyen
