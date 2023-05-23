@@ -136,5 +136,17 @@ class Transformer(nn.Module):
        
     # inference time
     @torch.no_grad()
-    def generate(self, src):
-        pass
+    def generate(self, idx, max_new_tokens):
+        self.eval()
+        for _ in range(max_new_tokens):
+            idx_cond = idx if idx.size(1) <= self.config.src_max_len else idx[:, -self.config.src_max_len:]
+            logits = self(idx_cond, idx, None, None)
+            prob = torch.softmax(logits[:, -1, :], dim=-1)
+
+            # sample from the probability distribution (random sampling)
+            idx = torch.cat([idx, torch.multinomial(prob, num_samples=1)], dim=1)
+
+
+        return idx
+            
+        

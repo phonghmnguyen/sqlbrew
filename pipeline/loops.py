@@ -67,7 +67,14 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
             model.train()
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
-                torch.save(model.state_dict(), path)
+                torch.save(
+                    {
+                        'epoch': epoch,
+                        'model_state_dict': model.state_dict(),
+                        'config': model.config,
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': best_val_loss
+                    } , path)
 
         print(f'Epoch [{epoch + 1}/{epochs}] | Loss: {train_loss / len(train_loader):.4f} | Acc: {train_acc / len(train_loader):.4f} | Val Loss: {val_loss / len(val_loader):.4f} | Val Acc: {val_acc / len(val_loader):.4f}')
 
