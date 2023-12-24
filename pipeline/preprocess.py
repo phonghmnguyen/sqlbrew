@@ -1,4 +1,5 @@
 import csv
+import json
 import torch
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
@@ -67,7 +68,13 @@ class WikiSQL(Dataset):
             self.tgt_token2idx = tgt_token2idx_map
             self.tgt_idx2token = dict((idx, token) for token, idx in tgt_token2idx_map.items())
 
-        self.data = self.load_data()
+        self.data = self._load_data()
+
+        with open('token_mappings/src_token2idx.json', 'w') as f:
+            json.dump(self.src_token2idx, f, indent=4)  
+        
+        with open('token_mappings/tgt_token2idx.json', 'w') as f:
+            json.dump(self.tgt_token2idx, f, indent=4)
         
     def __len__(self):
         return len(self.data)
@@ -84,9 +91,9 @@ class WikiSQL(Dataset):
         for token in tgt:
             if token not in self.tgt_token2idx:
                 self.tgt_token2idx[token] = len(self.tgt_token2idx)
-                self.tgt_idx2token[self.tgt_token2idx[token]] = token
+                self.tgt_idx2token[self.tgt_token2idx[token]] = token      
     
-    def load_data(self):
+    def _load_data(self):
         data = []
         with open(self.data_path, 'r') as f:
             reader = csv.DictReader(f)
@@ -97,7 +104,7 @@ class WikiSQL(Dataset):
 
         return data
     
-    def collate_fn(self, batch):
+    def _collate_fn(self, batch):
         src_tokens = [self.src_tokenizer(item['question']) for item in batch]
         tgt_tokens = [self.tgt_tokenizer(item['sql']) for item in batch]
         src_tokens = [[self.sos] + [self.src_token2idx.get(token, self.unk) for token in tokens] + [self.eos] for tokens in src_tokens]
@@ -107,7 +114,7 @@ class WikiSQL(Dataset):
         return Batch(src_tensor, tgt_tensor)
     
     def get_dataloader(self, batch_size, shuffle=True):
-        return DataLoader(self, batch_size=batch_size, shuffle=shuffle, collate_fn=self.collate_fn)
+        return DataLoader(self, batch_size=batch_size, shuffle=shuffle, collate_fn=self._collate_fn)
     
     def get_batch(self, batch_size, shuffle=True):
         dataloader = self.get_dataloader(batch_size, shuffle)

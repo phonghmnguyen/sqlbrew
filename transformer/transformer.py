@@ -129,24 +129,35 @@ class Transformer(nn.Module):
         enc_out = self._encode(src, src_mask) 
         dec_out = self._decode(enc_out, src_mask, tgt, tgt_mask)
         return self.dec_block.gen(dec_out)
-
-    @classmethod
-    def from_pretrained(self, path):
-        pass
        
     # inference time
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens):
+    def generate(self, input, max_new_tokens, start_token_idx=1, end_token_idx=2):
         self.eval()
+
+        enc_mem = self._encode(input, None)
+        
+        generated_tokens = torch.tensor([[start_token_idx]], dtype=torch.long, device=input.device)
+
         for _ in range(max_new_tokens):
-            idx_cond = idx if idx.size(1) <= self.config.src_max_len else idx[:, -self.config.src_max_len:]
-            logits = self(idx_cond, idx, None, None)
+            dec_out = self._decode(enc_mem, None, generated_tokens, None)
+            logits = self.dec_block.gen(dec_out)
             prob = torch.softmax(logits[:, -1, :], dim=-1)
 
             # sample from the probability distribution (random sampling)
-            idx = torch.cat([idx, torch.multinomial(prob, num_samples=1)], dim=1)
-
-
-        return idx
+            sampled_token = torch.multinomial(prob, num_samples=1)
             
+            # Append the sampled token to the input sequence for the next time step
+            generated_tokens = torch.cat([generated_tokens, sampled_token], dim=-1)
+
+            # check if the sampled token is the end token
+            if sampled_token.item() == end_token_idx:
+                break
+            
+
+        return generated_tokens
+
+
         
+        
+    

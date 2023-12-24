@@ -1,7 +1,5 @@
-import dataclasses
 import warnings
 import argparse
-import sqlparse
 import torch
 from torchtext.data.utils import get_tokenizer
 from tokenizers import ByteLevelBPETokenizer
@@ -28,15 +26,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--save_path', type=str, default=SAVE_PATH)
     parser.add_argument('--model_path', type=str, default=MODEL_PATH)
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--epochs', type=int, default=100)
+    parser.add_argument('--epochs', type=int, default=5000)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--weight_decay', type=float, default=1e-4)
-    parser.add_argument('--device', type=str, default='cpu')
+    parser.add_argument('--device', type=str, default='mps')
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--dmodel', type=int, default=128)
-    parser.add_argument('--nstack', type=int, default=2)
-    parser.add_argument('--nhead', type=int, default=4)
-    parser.add_argument('--dffn_hidden', type=int, default=512)
+    parser.add_argument('--dmodel', type=int, default=512)
+    parser.add_argument('--nstack', type=int, default=6)
+    parser.add_argument('--nhead', type=int, default=8)
+    parser.add_argument('--dffn_hidden', type=int, default=1024)
     parser.add_argument('--dropout', type=float, default=0.1)
     parser.add_argument('--label_smoothing', type=float, default=0.1)
     parser.add_argument('--src_max_len', type=int, default=100)
@@ -49,8 +47,6 @@ def main():
     args = parse_args()
     torch.manual_seed(args.seed)
     src_tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
-    #tgt_tokenizer = get_tokenizer(None) ## split by space
-    #tgt_tokenizer = lambda x: [str(token) for token in sqlparse.parse(x)[0].tokens]
     bpe_tokenizer = ByteLevelBPETokenizer.from_file("bpe-tokenizer/vocab.json", "bpe-tokenizer/merges.txt")
     tgt_tokenizer = lambda x: bpe_tokenizer.encode(x).tokens
 
@@ -85,8 +81,9 @@ def main():
             device=args.device
         )
 
-        mlflow.log_params(dataclasses.asdict(args))
-        mlflow.pytorch.log_model(model, 'models')
+        mlflow.log_params(vars(args))
+
+
 
 
 if __name__ == '__main__':

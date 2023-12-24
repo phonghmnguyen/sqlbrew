@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/2b514c4f4a42470a9f0181103dfcd633/artifacts
+end_time: 1696454585383
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: 2b514c4f4a42470a9f0181103dfcd633
+run_name: smiling-vole-328
+run_uuid: 2b514c4f4a42470a9f0181103dfcd633
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696454558014
+status: 4
+tags: []
+user_id: phongnguyen

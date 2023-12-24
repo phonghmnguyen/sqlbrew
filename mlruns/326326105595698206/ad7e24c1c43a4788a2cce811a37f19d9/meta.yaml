@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/ad7e24c1c43a4788a2cce811a37f19d9/artifacts
+end_time: 1696561885691
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: ad7e24c1c43a4788a2cce811a37f19d9
+run_name: stylish-penguin-734
+run_uuid: ad7e24c1c43a4788a2cce811a37f19d9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696561814711
+status: 4
+tags: []
+user_id: phongnguyen

@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/a4810746b6ad47e8ab318a71f770c34b/artifacts
+end_time: 1696455220366
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: a4810746b6ad47e8ab318a71f770c34b
+run_name: gifted-dog-439
+run_uuid: a4810746b6ad47e8ab318a71f770c34b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696455207025
+status: 4
+tags: []
+user_id: phongnguyen

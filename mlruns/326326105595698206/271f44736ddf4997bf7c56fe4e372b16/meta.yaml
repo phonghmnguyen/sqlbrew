@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/271f44736ddf4997bf7c56fe4e372b16/artifacts
+end_time: 1696555751960
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: 271f44736ddf4997bf7c56fe4e372b16
+run_name: painted-calf-517
+run_uuid: 271f44736ddf4997bf7c56fe4e372b16
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696555544290
+status: 3
+tags: []
+user_id: phongnguyen

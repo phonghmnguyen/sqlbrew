@@ -1,0 +1,7 @@
+torchtext
+torch
+torchvision
+tokenizers
+mlflow
+Flask
+spacy

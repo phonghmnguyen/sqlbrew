@@ -53,8 +53,9 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
                 src, tgt, tgt_y = batch.src, batch.tgt, batch.tgt_y
                 src_mask, tgt_mask = batch.src_mask, batch.tgt_mask
                 
-                src = torch.tensor(src).to(device)
-                tgt = torch.tensor(tgt).to(device)
+                src, tgt, tgt_y = torch.tensor(src).to(device), torch.tensor(tgt).to(device), torch.tensor(tgt_y).to(device)
+                src_mask, tgt_mask = torch.tensor(src_mask).to(device), torch.tensor(tgt_mask).to(device)
+
 
                 output = model(src, tgt, src_mask, tgt_mask)
                 flatten_output = output.contiguous().view(-1, output.size(-1))

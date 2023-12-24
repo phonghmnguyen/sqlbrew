@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/37c91c5cbd7c4ddfb8a0f968ab846583/artifacts
+end_time: 1696562343977
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: 37c91c5cbd7c4ddfb8a0f968ab846583
+run_name: useful-chimp-180
+run_uuid: 37c91c5cbd7c4ddfb8a0f968ab846583
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696562208784
+status: 4
+tags: []
+user_id: phongnguyen

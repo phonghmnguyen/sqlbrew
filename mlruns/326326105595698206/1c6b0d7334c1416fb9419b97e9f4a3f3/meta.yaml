@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/phongnguyen/Documents/sql-query-rec/mlruns/326326105595698206/1c6b0d7334c1416fb9419b97e9f4a3f3/artifacts
+end_time: 1696376297427
+entry_point_name: ''
+experiment_id: '326326105595698206'
+lifecycle_stage: active
+run_id: 1c6b0d7334c1416fb9419b97e9f4a3f3
+run_name: traveling-roo-555
+run_uuid: 1c6b0d7334c1416fb9419b97e9f4a3f3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1696376271050
+status: 4
+tags: []
+user_id: phongnguyen
