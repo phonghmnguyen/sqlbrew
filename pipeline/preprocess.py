@@ -70,10 +70,10 @@ class WikiSQL(Dataset):
 
         self.data = self._load_data()
 
-        with open('token_mappings/src_token2idx.json', 'w') as f:
+        with open('tokenmap/src_token2idx.json', 'w') as f:
             json.dump(self.src_token2idx, f, indent=4)  
         
-        with open('token_mappings/tgt_token2idx.json', 'w') as f:
+        with open('tokenmap/tgt_token2idx.json', 'w') as f:
             json.dump(self.tgt_token2idx, f, indent=4)
         
     def __len__(self):

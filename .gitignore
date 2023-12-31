@@ -349,4 +349,4 @@ venv/
 *.log
 sweep/
 
-saved_models/
+model/

@@ -1,14 +1,16 @@
 import json
 import torch
 from torchtext.data.utils import get_tokenizer
-from tokenizers import ByteLevelBPETokenizer
+from tokenizers import Tokenizer
 from transformer import Transformer
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+MODEL_PATH = 'model/sqlify.pt'
+
 def load_model():
-    checkpoint = torch.load('saved_models/eng2sql.pt', map_location=torch.device('cpu'))
+    checkpoint = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
     config = checkpoint['config']
     model = Transformer(config)
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -20,8 +22,8 @@ model = load_model()
 # load model from pytorch
 
 # load token mappings
-src_token2idx = json.load(open('token_mappings/src_token2idx.json', 'r'))
-tgt_token2idx = json.load(open('token_mappings/tgt_token2idx.json', 'r'))
+src_token2idx = json.load(open('tokenmap/src_token2idx.json', 'r'))
+tgt_token2idx = json.load(open('tokenmap/tgt_token2idx.json', 'r'))
 tgt_idx2token = dict((idx, token) for token, idx in tgt_token2idx.items())
 
 
@@ -33,7 +35,7 @@ def generate():
         return jsonify({'error': 'query is required'}), 400
     
     src_tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
-    bpe_tokenizer = ByteLevelBPETokenizer.from_file("bpe-tokenizer/vocab.json", "bpe-tokenizer/merges.txt")
+    bpe_tokenizer = Tokenizer.from_file('tokenizer/bpetokenizer.json')
 
     src_tokens = src_tokenizer(query)
     src_tokens = [src_token2idx['<sos>']] + [src_token2idx.get(token, src_token2idx['<unk>']) for token in src_tokens] + [src_token2idx['<eos>']]
