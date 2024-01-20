@@ -37,11 +37,8 @@ def train(model, train_data, val_data, epochs=10, batch_size=32, lr=1e-3, weight
             train_acc += acc.item()
             
             scheduler.zero_grad()
-            #optimizer.zero_grad()
             loss.backward()
             scheduler.step()
-            #optimizer.step()
-           
             
             print(f'Epoch [{epoch + 1}/{epochs}] | Step [{i + 1}/{len(train_loader)}] | Loss: {loss.item():.4f}')
         
