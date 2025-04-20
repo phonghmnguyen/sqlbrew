@@ -3,11 +3,12 @@ import torch
 from torchtext.data.utils import get_tokenizer
 from tokenizers import Tokenizer
 from transformer import Transformer
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
-app = Flask(__name__)
+app = FastAPI(title="SQL Generator API")
 
-MODEL_PATH = 'model/sqlify.pt'
+MODEL_PATH = 'model/sqlbrew.pt'
 
 def load_model():
     checkpoint = torch.load(MODEL_PATH, map_location=torch.device('cpu'))
@@ -29,12 +30,19 @@ tgt_idx2token = dict((idx, token) for token, idx in tgt_token2idx.items())
 src_tokenizer = get_tokenizer('spacy', language='en_core_web_sm')
 bpe_tokenizer = Tokenizer.from_file('tokenizer/bpetokenizer.json')
 
-@app.route('/generate', methods=['POST'])
-def generate():
-    req = request.get_json(force=True)
-    query = req.get('query')
+# Define request model
+class QueryRequest(BaseModel):
+    query: str
+
+# Define response model
+class QueryResponse(BaseModel):
+    sql: str
+
+@app.post("/generate")
+async def generate(request: QueryRequest) -> QueryResponse:
+    query = request.query
     if not query:
-        return jsonify({'error': 'query is required'}), 400
+        raise HTTPException(status_code=400, detail="query is required")
 
     src_tokens = src_tokenizer(query)
     src_tokens = [src_token2idx['<sos>']] + [src_token2idx.get(token, src_token2idx['<unk>']) for token in src_tokens] + [src_token2idx['<eos>']]
@@ -44,10 +52,9 @@ def generate():
     res = [tgt_idx2token[idx] for idx in res if idx not in [tgt_token2idx['<sos>'], tgt_token2idx['<eos>'], tgt_token2idx['<pad>']]]
     token_ids = [bpe_tokenizer.token_to_id(token) for token in res]
     res = bpe_tokenizer.decode(token_ids)
-    
-    return jsonify({'sql': res}), 200
-    
-    
+
+    return QueryResponse(sql=res)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=4000, debug=True)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=4000)

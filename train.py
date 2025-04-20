@@ -11,8 +11,8 @@ from pipeline import WikiSQL, train
 TRAIN_DATA_PATH = 'data/train.csv'
 VAL_DATA_PATH = 'data/validation.csv'
 TEST_DATA_PATH = 'data/test.csv'
-SAVE_PATH = 'model/sqlify.pt'
-MODEL_PATH = 'model/sqlify.pt'
+SAVE_PATH = 'model/sqlbrew.pt'
+MODEL_PATH = 'model/sqlbrew.pt'
 
 SPECIAL_TOKENS = {'<pad>': 0, '<sos>': 1, '<eos>': 2, '<unk>': 3}
 
@@ -42,7 +42,7 @@ def parse_args() -> argparse.Namespace:
 
     return parser.parse_args()
 
-        
+
 def main():
     args = parse_args()
     torch.manual_seed(args.seed)
@@ -52,7 +52,7 @@ def main():
 
     train_data = WikiSQL(args.train_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS)
     val_data = WikiSQL(args.val_data_path, src_tokenizer, tgt_tokenizer, SPECIAL_TOKENS, False, train_data.src_token2idx, train_data.tgt_token2idx)
-    
+
     config = TransformerConfig(
         d_model=args.dmodel,
         n_stack=args.nstack,
@@ -89,8 +89,3 @@ def main():
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
     main()
-    
-    
-
-
-
